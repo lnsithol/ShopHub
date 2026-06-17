@@ -10,6 +10,7 @@ app = Flask(__name__)
 # Configure SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/myshop_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Avoids a warning
+app.config['SECRET_KEY'] = 'my-super-secret-key'
 
 # Create SQLAlchemy instance
 db = SQLAlchemy(app)
@@ -179,11 +180,11 @@ def register():
     return render_template("auth/register.html")
 
 @app.route("/dashboard")
-# @login_required
+@login_required
 def dashboard():
 
     return render_template(
-        "customer/dashboard.html"
+        "customer/dashboard.html", username='Guest'
     )
 
 @app.route('/products')
