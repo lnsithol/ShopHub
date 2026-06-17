@@ -178,6 +178,14 @@ def register():
 
     return render_template("auth/register.html")
 
+@app.route("/dashboard")
+# @login_required
+def dashboard():
+
+    return render_template(
+        "customer/dashboard.html"
+    )
+
 @app.route('/products')
 def products():
     products = [
