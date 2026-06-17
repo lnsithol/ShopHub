@@ -57,7 +57,7 @@ class User(UserMixin, db.Model):
 
     created_at = db.Column(
         db.DateTime,
-        default=datetime.utcnow
+        default=datetime.now
     )
 
     def __repr__(self):
@@ -178,6 +178,11 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("auth/register.html")
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route("/dashboard")
 @login_required
