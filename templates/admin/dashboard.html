@@ -1,0 +1,439 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="fw-bold mb-1">Dashboard</h2>
+        <p class="text-muted mb-0">
+            Welcome back, {{ current_user.username }}
+        </p>
+    </div>
+
+    <div>
+        <a href="/admin/reports" class="btn btn-primary">
+            <i class="bi bi-download"></i>
+            Export Report
+        </a>
+    </div>
+
+</div>
+
+<!-- KPI CARDS -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card kpi-card">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <small class="text-muted">
+                            Total Revenue
+                        </small>
+
+                        <h3 class="fw-bold mt-2">
+                            E{{ revenue or 0 }}
+                        </h3>
+
+                    </div>
+
+                    <div class="kpi-icon bg-success-subtle">
+
+                        <i class="bi bi-cash-stack text-success"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card kpi-card">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <small class="text-muted">
+                            Orders
+                        </small>
+
+                        <h3 class="fw-bold mt-2">
+                            {{ total_orders }}
+                        </h3>
+
+                    </div>
+
+                    <div class="kpi-icon bg-primary-subtle">
+
+                        <i class="bi bi-bag-check text-primary"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card kpi-card">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <small class="text-muted">
+                            Customers
+                        </small>
+
+                        <h3 class="fw-bold mt-2">
+                            {{ total_users }}
+                        </h3>
+
+                    </div>
+
+                    <div class="kpi-icon bg-info-subtle">
+
+                        <i class="bi bi-people text-info"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+
+        <div class="card kpi-card">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <small class="text-muted">
+                            Products
+                        </small>
+
+                        <h3 class="fw-bold mt-2">
+                            {{ total_products }}
+                        </h3>
+
+                    </div>
+
+                    <div class="kpi-icon bg-warning-subtle">
+
+                        <i class="bi bi-box-seam text-warning"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CHART + QUICK ACTIONS -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-lg-8">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+                    Revenue Overview
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="salesChart" height="120"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+                    Quick Actions
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="d-grid gap-3">
+
+                    <a href="/admin/products/create"
+                       class="btn btn-outline-primary">
+
+                        <i class="bi bi-plus-circle"></i>
+                        Add Product
+
+                    </a>
+
+                    <a href="/admin/categories/create"
+                       class="btn btn-outline-success">
+
+                        <i class="bi bi-tags"></i>
+                        Add Category
+
+                    </a>
+
+                    <a href="/admin/users/create"
+                       class="btn btn-outline-info">
+
+                        <i class="bi bi-person-plus"></i>
+                        Add User
+
+                    </a>
+
+                    <a href="/admin/orders"
+                       class="btn btn-outline-warning">
+
+                        <i class="bi bi-bag-check"></i>
+                        View Orders
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- RECENT ORDERS -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-lg-8">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between">
+
+                <h5 class="mb-0">
+                    Recent Orders
+                </h5>
+
+                <a href="/admin/orders">
+                    View All
+                </a>
+
+            </div>
+
+            <div class="card-body">
+
+                <table class="table table-hover">
+
+                    <thead>
+
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for order in recent_orders %}
+
+                        <tr>
+
+                            <td>
+                                {{ order.order_number }}
+                            </td>
+
+                            <td>
+                                {{ order.customer.username }}
+                            </td>
+
+                            <td>
+
+                                <span class="badge bg-primary">
+
+                                    {{ order.status }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+                                E{{ order.total_amount }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+                    New Customers
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% for user in recent_users %}
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <div>
+
+                        <div class="fw-semibold">
+                            {{ user.username }}
+                        </div>
+
+                        <small class="text-muted">
+                            {{ user.email }}
+                        </small>
+
+                    </div>
+
+                    <span class="badge bg-success">
+                        New
+                    </span>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- LOW STOCK -->
+
+<div class="card">
+
+    <div class="card-header d-flex justify-content-between">
+
+        <h5 class="mb-0">
+            Low Stock Products
+        </h5>
+
+        <a href="/admin/products">
+            Manage Products
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-hover">
+
+            <thead>
+
+                <tr>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for product in low_stock_products %}
+
+                <tr>
+
+                    <td>{{ product.name }}</td>
+
+                    <td>{{ product.sku }}</td>
+
+                    <td>{{ product.stock_quantity }}</td>
+
+                    <td>
+
+                        <span class="badge bg-danger">
+
+                            Low Stock
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

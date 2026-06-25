@@ -1,0 +1,411 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Products{% endblock %}
+
+{% block page_title %}
+Products Management
+{% endblock %}
+
+{% block content %}
+
+<!-- PAGE ACTIONS -->
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h4 class="fw-bold mb-1">
+            Products
+        </h4>
+
+        <p class="text-muted mb-0">
+            Manage all products in your store
+        </p>
+
+    </div>
+
+    <div>
+
+        <a href="/admin/products/create" class="btn btn-primary">
+
+            <i class="bi bi-plus-circle me-2"></i>
+
+            Add Product
+
+        </a>
+
+    </div>
+
+</div>
+
+<!-- STATS -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+
+        <div class="card kpi-card">
+
+            <div class="card-body">
+
+                <small class="text-muted">
+
+                    Total Products
+
+                </small>
+
+                <h3 class="fw-bold">
+
+                    {{ products|length }}
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card kpi-card">
+
+            <div class="card-body">
+
+                <small class="text-muted">
+
+                    Active
+
+                </small>
+
+                <h3 class="fw-bold text-success">
+
+                    {{ products|selectattr('status','equalto','active')|list|length }}
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card kpi-card">
+
+            <div class="card-body">
+
+                <small class="text-muted">
+
+                    Low Stock
+
+                </small>
+
+                <h3 class="fw-bold text-warning">
+
+                    {{ products|selectattr('stock_quantity','lt',10)|list|length }}
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3">
+
+        <div class="card kpi-card">
+
+            <div class="card-body">
+
+                <small class="text-muted">
+
+                    Out of Stock
+
+                </small>
+
+                <h3 class="fw-bold text-danger">
+
+                    {{ products|selectattr('stock_quantity','equalto',0)|list|length }}
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- FILTERS -->
+
+<div class="card mb-4">
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+
+                <input type="text" class="form-control" placeholder="Search products...">
+
+            </div>
+
+            <div class="col-md-3">
+
+                <select class="form-select">
+
+                    <option>
+                        All Categories
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <select class="form-select">
+
+                    <option>
+                        All Status
+                    </option>
+
+                    <option>
+                        Active
+                    </option>
+
+                    <option>
+                        Inactive
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="col-md-2">
+
+                <button class="btn btn-outline-primary w-100">
+
+                    Filter
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- PRODUCTS TABLE -->
+
+<div class="card">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h5 class="mb-0">
+
+            Product Catalog
+
+        </h5>
+
+        <div>
+
+            <button class="btn btn-outline-secondary btn-sm">
+
+                Export
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card-body p-0">
+
+        <table class="table table-hover align-middle mb-0">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Image</th>
+
+                    <th>Name</th>
+
+                    <th>SKU</th>
+
+                    <th>Category</th>
+
+                    <th>Price</th>
+
+                    <th>Stock</th>
+
+                    <th>Status</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for product in products %}
+
+                <tr>
+
+                    <td>
+
+                        #{{ product.id }}
+
+                    </td>
+
+                    <td>
+                        <img src="{% if product.image %}
+                            {{ url_for(
+                                'static',
+                                filename='uploads/products/' ~ product.image
+                            ) }}
+                        {% else %}
+                            https://via.placeholder.com/80
+                        {% endif %}" width="70" height="70" class="rounded">
+
+                    </td>
+
+                    <td>
+
+                        <div class="fw-semibold">
+
+                            {{ product.name }}
+
+                        </div>
+
+                    </td>
+
+                    <td>
+
+                        {{ product.sku }}
+
+                    </td>
+
+                    <td>
+
+                        {{ product.category.name }}
+
+                    </td>
+
+                    <td>
+
+                        E{{ "%.2f"|format(product.price) }}
+
+                    </td>
+
+                    <td>
+
+                        {% if product.stock_quantity == 0 %}
+
+                        <span class="badge bg-danger">
+
+                            Out Of Stock
+
+                        </span>
+
+                        {% elif product.stock_quantity < 10 %} <span class="badge bg-warning">
+
+                            {{ product.stock_quantity }}
+
+                            </span>
+
+                            {% else %}
+
+                            <span class="badge bg-success">
+
+                                {{ product.stock_quantity }}
+
+                            </span>
+
+                            {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if product.status == "active" %}
+
+                        <span class="badge bg-success">
+
+                            Active
+
+                        </span>
+
+                        {% else %}
+
+                        <span class="badge bg-secondary">
+
+                            Inactive
+
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <div class="dropdown">
+
+                            <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+
+                                <i class="bi bi-three-dots"></i>
+
+                            </button>
+
+                            <ul class="dropdown-menu">
+
+                                <li>
+
+                                    <a class="dropdown-item" href="/admin/products/edit/{{ product.id }}">
+
+                                        Edit
+
+                                    </a>
+
+                                </li>
+
+                                <li>
+
+                                    <a class="dropdown-item text-danger" href="/admin/products/delete/{{ product.id }}">
+
+                                        Delete
+
+                                    </a>
+
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
